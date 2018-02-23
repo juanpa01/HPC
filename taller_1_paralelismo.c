@@ -47,13 +47,13 @@ void suma_vectores(int size) {
     if (tid == 0)
     {
       nthreads = omp_get_num_threads();
-      printf("Number of threads = %d\n", nthreads);
+      printf("Number of threads = %.2f\n", nthreads);
     }
-    printf("Thread %d starting...\n",tid);
+    printf("Thread %.2f starting...\n",tid);
     #pragma omp for schedule(dynamic, chunk)
     for ( j = 0; j < size; j++) {
       result[j] = vec1[j] + vec2[j];
-      //printf("Thread %d: c[%d]= %f\n",tid,j,result[j]);
+      printf("Thread %.2f: c[%d]= %.2f\n",tid,j,result[j]);
     }
 
   file_vector(vec1, size);
@@ -171,7 +171,7 @@ int main(int argc, char const *argv[]) {
   printf("Ingrese el numero de columnas de la matriz B\n");
   scanf("%d",&cols2);
 */
-  suma_vectores(100);
+  suma_vectores(2000);
   //multiplicacion_matrices(rows1,cols1,rows2,cols2);
   //multiplicacion_matrices(10,10,10,10);
   return 0;
