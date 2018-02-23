@@ -37,15 +37,23 @@ void file_vector(float *vec,int size ){
 
 
 void suma_vectores(int size) {
-  int j, chunk = 100 ;
-  float *vec1, *vec2, *result;
+  int j, chunk = 10 ;
+  float *vec1, *vec2, *result, tid, nthreads;
   vec1 = array_dinamic(size);
   vec2 = array_dinamic(size);
   result =(float *)malloc(size*sizeof(int));
-  #pragma omp parallel shared(result, vec1, vec2) private(i)
+  #pragma omp parallel shared(result, vec1, vec2) private(j, tid, nthreads)
+    tid = omp_get_thread_num();
+    if (tid == 0)
+    {
+      nthreads = omp_get_num_threads();
+      printf("Number of threads = %d\n", nthreads);
+    }
+    printf("Thread %d starting...\n",tid);
     #pragma omp for schedule(dynamic, chunk)
     for ( j = 0; j < size; j++) {
       result[j] = vec1[j] + vec2[j];
+      //printf("Thread %d: c[%d]= %f\n",tid,j,result[j]);
     }
 
   file_vector(vec1, size);
@@ -115,9 +123,9 @@ void multiplicacion_matrices(int rows1, int cols1, int rows2, int cols2 ) {
     mat2 = matrix_dinamic(rows2, cols2);
     result = matrix_dinamic(rows1, cols2);
     #pragma omp parallel shared(mat1, mat2, result) private(tid, i, j, k,nthreads)
-      //tid = omp_get_thread_num();
-      nthreads = omp_get_num_threads();
-      printf("Number of threads = %d\n", nthreads);
+      tid = omp_get_thread_num();
+      //nthreads = omp_get_num_threads();
+      printf("Number of threads = %d\n", tid);
       #pragma omp for schedule(dynamic, chunk)
       for ( i = 0; i < rows1; ++i)
       {
@@ -163,8 +171,8 @@ int main(int argc, char const *argv[]) {
   printf("Ingrese el numero de columnas de la matriz B\n");
   scanf("%d",&cols2);
 */
-  //suma_vectores(10000);
+  suma_vectores(100);
   //multiplicacion_matrices(rows1,cols1,rows2,cols2);
-  multiplicacion_matrices(1000,1000,1000,1000);
+  //multiplicacion_matrices(10,10,10,10);
   return 0;
 }
