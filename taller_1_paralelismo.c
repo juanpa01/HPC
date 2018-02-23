@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+clock_t inicio, final;
+
 float* array_dinamic(int num) {
   int i;
   time_t t;
@@ -37,12 +39,14 @@ void file_vector(float *vec,int size ){
 
 
 void suma_vectores(int size) {
-  int j, chunk = 10 ;
+  int j, chunk = 1000 ;
   float *vec1, *vec2, *result, tid, nthreads;
   vec1 = array_dinamic(size);
   vec2 = array_dinamic(size);
   result =(float *)malloc(size*sizeof(int));
+  inicio = clock();
   #pragma omp parallel shared(result, vec1, vec2) private(j, tid, nthreads)
+  {
     tid = omp_get_thread_num();
     if (tid == 0)
     {
@@ -51,10 +55,14 @@ void suma_vectores(int size) {
     }
     printf("Thread %.2f starting...\n",tid);
     #pragma omp for schedule(dynamic, chunk)
-    for ( j = 0; j < size; j++) {
-      result[j] = vec1[j] + vec2[j];
-      printf("Thread %.2f: c[%d]= %.2f\n",tid,j,result[j]);
-    }
+      for ( j = 0; j < size; j++) {
+        result[j] = vec1[j] + vec2[j];
+        //printf("Thread %.2f: c[%d]= %.2f\n",tid,j,result[j]);
+      }
+  }
+
+  final = clock();
+  printf("%.6f \n",(double)(final - inicio) / CLOCKS_PER_SEC );
 
   file_vector(vec1, size);
   file_vector(vec2, size);
@@ -114,7 +122,7 @@ void file_matrix (float **matrix, int row, int col){
 
 void multiplicacion_matrices(int rows1, int cols1, int rows2, int cols2 ) {
   float **mat1, **mat2, **result ;
-  int j, i, k, chunk = 100, tid, nthreads;
+  int j, i, k, chunk = 250, tid, nthreads;
 
   if (rows1 != cols2) {
     printf("El numero de filas de la primera matriz debe ser ligual al numero de columnas de la segunda matriz\n" );
@@ -122,11 +130,19 @@ void multiplicacion_matrices(int rows1, int cols1, int rows2, int cols2 ) {
     mat1 = matrix_dinamic(rows1, cols1);
     mat2 = matrix_dinamic(rows2, cols2);
     result = matrix_dinamic(rows1, cols2);
+
+    inicio = clock();
+
     #pragma omp parallel shared(mat1, mat2, result) private(tid, i, j, k,nthreads)
+    {
       tid = omp_get_thread_num();
-      //nthreads = omp_get_num_threads();
-      printf("Number of threads = %d\n", tid);
-      #pragma omp for schedule(dynamic, chunk)
+      if (tid == 0)
+      {
+        nthreads = omp_get_num_threads();
+        printf("Number of threads = %d\n", nthreads);
+      }
+      printf("Thread %d starting...\n",tid);
+      #pragma omp for schedule(dynamic, chunk) private(i, j, k)
       for ( i = 0; i < rows1; ++i)
       {
       	for ( j = 0; j < cols2; ++j)
@@ -134,10 +150,13 @@ void multiplicacion_matrices(int rows1, int cols1, int rows2, int cols2 ) {
       		for ( k = 0; k < cols1; ++k)
       		{
       			result[i][j] = result[i][j]+mat1[i][k]*mat2[k][j];
-            printf("%d\n",tid );
       		}
       	}
       }
+    }
+
+    final= clock();
+    printf("%.6f \n",(double)(final - inicio) / CLOCKS_PER_SEC );
     file_matrix(mat1, rows1, cols1);
     file_matrix(mat2, rows2, cols2);
     file_matrix(result, rows1, cols2);
@@ -153,6 +172,7 @@ void multiplicacion_matrices(int rows1, int cols1, int rows2, int cols2 ) {
 
 int main(int argc, char const *argv[]) {
   int size, rows1, rows2, cols1, cols2;
+
   /*
   printf("Ingrese tamaño de los dos vectores a sumar:\n");
   scanf("%d",&size);
@@ -171,8 +191,8 @@ int main(int argc, char const *argv[]) {
   printf("Ingrese el numero de columnas de la matriz B\n");
   scanf("%d",&cols2);
 */
-  suma_vectores(2000);
+  suma_vectores(200000);
   //multiplicacion_matrices(rows1,cols1,rows2,cols2);
-  //multiplicacion_matrices(10,10,10,10);
+  multiplicacion_matrices(1000,1000,1000,1000);
   return 0;
 }
