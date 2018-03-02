@@ -193,6 +193,6 @@ int main(int argc, char const *argv[]) {
 */
   suma_vectores(200000);
   //multiplicacion_matrices(rows1,cols1,rows2,cols2);
-  multiplicacion_matrices(1000,1000,1000,1000);
+  multiplicacion_matrices(1200,1200,1200,1200);
   return 0;
 }
