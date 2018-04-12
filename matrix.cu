@@ -1,15 +1,15 @@
 #include <stdlib.h>
 #include <cuda.h>
+#include <stdio.h>
 
 __host__
-void llenar(float *h_a, int tam) {
+void llenar(float *d_a, int tam) {
   int n = 10;
   for (int i = 0; i < tam; i++) {
-    h_a[i] = n;
+    d_a[i] = n;
   }
 }
 
-__host__
 void print(float *V, int tam){
   for (int i = 0; i < tam; i++) {
     printf("%.2f ", V[i]);
@@ -19,7 +19,7 @@ void print(float *V, int tam){
 
 __global__
 
-void mult_mat(float* h_a, float* h_b , int n) {
+void mult_matKernel(float* h_a, float* h_b , int n) {
   int i = threadIdx.x + blockDim.x *blockIdx.x;
   if (i < n) {
     h_b[i] = h_a[i] * 2 ;
@@ -27,7 +27,6 @@ void mult_mat(float* h_a, float* h_b , int n) {
 }
 
 
-__global__
 int main(int argc, char const *argv[]) {
   int n = 100;
 
@@ -40,25 +39,28 @@ int main(int argc, char const *argv[]) {
 
   error = cudaMalloc((void**)&d_a, n*sizeof(float));
   if (error != cudaSuccess) {
-    printf("Error al asignar espacio a d_a\n", );
+    printf("Error al asignar espacio a d_a\n" );
     return 1;
   }
 
   error = cudaMalloc((void**)&d_b, n*sizeof(float));
   if (error != cudaSuccess) {
-    printf("Error al asignar espacio a d_a\n", );
+    printf("Error al asignar espacio a d_b\n" );
     return 1;
   }
 
   llenar(h_a, n);
+  
+ cudaMemcpy(d_a, h_a, n*sizeof(float), cudaMemcpyHostToDevice);
 
-  cudaMemcpy(d_a, h_a, n*sizeof(float), cudaMemcpyHostToDevice);
+ dim3 dimGrid(ceil(n/10.0), 1, 1);
+  dim3 dimBlock(10,1,1);
 
-  mult_mat<<<ceil(n/float(10)),10>>>(h_a, h_b, n);
+  mult_matKernel<<<dimGrid, dimBlock>>>(h_a, h_b, n);
 
-  cudaMemcpy(h_b, d_b, m*sizeof(float), cudaMemcpyDeviceToHost);
+  cudaMemcpy(h_b, d_b, n*sizeof(float), cudaMemcpyDeviceToHost);
 
-  print(h_b, n);
+  print(d_b, n);
 
   free(h_a);
   free(h_b);
