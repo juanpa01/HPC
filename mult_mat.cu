@@ -3,7 +3,7 @@
 #include <cuda.h>
 
 __host__
-void fill_matrix(float *mat, FILE source, int tam){
+void fill_matrix(float *mat, FILE *source, int tam){
 	for (int i = 0; i < tam; ++i){
 		fscanf(source, "%f,", &mat[tam]);
 	}
