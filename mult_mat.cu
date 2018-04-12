@@ -8,7 +8,7 @@ void fill_matrix(float *mat, FILE *source, int rows, int cols){
 		fscanf(source, "%f,", &mat[tam]);
 	}*/
 	for (int i = 0; i < rows; ++i){
-		for (int j = 0; j < cols; ++j){
+		for (int j = 0; j < cols; j++j){
 			fscanf(source, "%f,", &mat[i * cols + j]);
 		}
 	}
