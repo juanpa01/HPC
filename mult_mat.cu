@@ -3,10 +3,16 @@
 #include <cuda.h>
 
 __host__
-void fill_matrix(float *mat, FILE *source, int tam){
-	for (int i = 0; i < tam; ++i){
+void fill_matrix(float *mat, FILE *source, int rows, int cols){
+	/*for (int i = 0; i < tam; ++i){
 		fscanf(source, "%f,", &mat[tam]);
-	}
+	}*/
+	for (int i = 0; i < rows; ++i){
+		for (int j = 0; j < cols; ++j){
+			fscanf(source, "%f,", &mat[i * cols + j]);
+		}
+
+	fclose(source);
 }
 
 void print(float *V, int tam){
@@ -82,8 +88,8 @@ int main(int argc, char const** argv)
 	}
 
 	//llenar las matrices de las variables de cpu
-	fill_matrix(A, file_1, colA*rowA);
-	fill_matrix(B, file_2, colB*rowB); 
+	fill_matrix(A, file_1, colA, rowA);
+	fill_matrix(B, file_2, colB, rowB); 
 
 	//copiar los que tenemos en las variables de cpu a las variables de gpu
 	cudaMemcpy(d_a, A, colA*rowA*sizeof(float), cudaMemcpyHostToDevice);
