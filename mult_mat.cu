@@ -84,11 +84,13 @@ int main(int argc, char const *argv[])
 	//copiamos el resultado desde la variable de la gpa a la variable de la cpu
 	cudaMemcpy(R, d_r, col*row*sizeof(float), cudaMemcpyDeviceToHost);
 
+	//imprimimos el resultado
+	print(R, col*row);
 
+	printf("\n");
 
-
-	//print(A, col*row);	
-	//printf("\n");
-	//print(B, col*row);
+	print(A, col*row);	
+	printf("\n");
+	print(B, col*row);
 	return 0;
 }
