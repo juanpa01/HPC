@@ -104,13 +104,17 @@ int main(int argc, char const** argv)
 	cudaMemcpy(R, d_r, colB*rowA*sizeof(float), cudaMemcpyDeviceToHost);
 
 	//imprimimos el resultado
-	print(R, colB*rowA);
-
-	printf("\n");
-
+	
+	printf("Matriz A\n");
 	print(A, colA*rowA);	
 	printf("\n");
+	printf("MAtriz B\n");
 	print(B, colB*rowB);
+	printf("\n");
+	printf("Matriz Resultado\n");
+	print(R, colB*rowA);
+
+	
 
 	//liberar espacio en memoria
 	free(A); free(B); free(R);

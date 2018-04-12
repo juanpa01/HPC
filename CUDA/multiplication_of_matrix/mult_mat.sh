@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=mult_mat
-#SBATCH --output=mult_mat.out
+#SBATCH --output=res_mult_mat.out
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
 #SBATCH  --gres=gpu:1
