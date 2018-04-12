@@ -40,25 +40,27 @@ int main(int argc, char const *argv[]) {
   error = cudaMalloc((void**)&d_a, n*sizeof(float));
   if (error != cudaSuccess) {
     printf("Error al asignar espacio a d_a\n" );
-    return 1;
+    return 0;
   }
 
   error = cudaMalloc((void**)&d_b, n*sizeof(float));
   if (error != cudaSuccess) {
     printf("Error al asignar espacio a d_b\n" );
-    return 1;
+    return 0;
   }
 
   llenar(h_a, n);
   
  cudaMemcpy(d_a, h_a, n*sizeof(float), cudaMemcpyHostToDevice);
-
+//print(d_a, n);
+//print(h_a, n);
  dim3 dimGrid(ceil(n/10.0), 1, 1);
   dim3 dimBlock(10,1,1);
 
-  mult_matKernel<<<dimGrid, dimBlock>>>(h_a, h_b, n);
-
+  mult_matKernel<<<dimGrid, dimBlock>>>(d_a, d_b, n);
+cudaDeviceSynchronize();
   cudaMemcpy(h_b, d_b, n*sizeof(float), cudaMemcpyDeviceToHost);
+
 
   print(h_b, n);
 
