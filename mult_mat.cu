@@ -82,8 +82,8 @@ int main(int argc, char const** argv)
 	}
 
 	//llenar las matrices de las variables de cpu
-	fill_matrix(A, colA*rowA);
-	fill_matrix(B, colB*rowB); 
+	fill_matrix(A, file_1, colA*rowA);
+	fill_matrix(B, file_2, colB*rowB); 
 
 	//copiar los que tenemos en las variables de cpu a las variables de gpu
 	cudaMemcpy(d_a, A, colA*rowA*sizeof(float), cudaMemcpyHostToDevice);
@@ -95,7 +95,7 @@ int main(int argc, char const** argv)
 	dim3 dimBlock(4, 1, 1);
 
 	//kernel
-	matrixKernel<<<dimGrid, dimBlock>>>(d_a, d_b, d_r, col*row);
+	matrixKernel<<<dimGrid, dimBlock>>>(d_a, d_b, d_r, colB*rowA);
 
 	//copiamos el resultado desde la variable de la gpa a la variable de la cpu
 	cudaMemcpy(R, d_r, colB*rowA*sizeof(float), cudaMemcpyDeviceToHost);
@@ -108,5 +108,9 @@ int main(int argc, char const** argv)
 	print(A, colA*rowA);	
 	printf("\n");
 	print(B, colB*rowB);
+
+	//liberar espacio en memoria
+	free(A); free(B); free(R);
+	cudaFree(d_a); cudaFree(d_b); cudaFree(d_r);
 	return 0;
 }
