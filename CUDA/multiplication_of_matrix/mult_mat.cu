@@ -4,11 +4,8 @@
 
 __host__
 void fill_matrix(float *mat, FILE *source, int rows, int cols){
-	/*for (int i = 0; i < tam; ++i){
-		fscanf(source, "%f,", &mat[tam]);
-	}*/
-	for (int i = 0; i < rows; ++i){
-		for (int j = 0; j < cols; j++j){
+	for (int i = 0; i < rows; i++){
+		for (int j = 0; j < cols; j++){
 			fscanf(source, "%f,", &mat[i * cols + j]);
 		}
 	}
