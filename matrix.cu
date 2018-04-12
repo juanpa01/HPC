@@ -60,7 +60,7 @@ int main(int argc, char const *argv[]) {
 
   cudaMemcpy(h_b, d_b, n*sizeof(float), cudaMemcpyDeviceToHost);
 
-  print(d_b, n);
+  print(h_b, n);
 
   free(h_a);
   free(h_b);
