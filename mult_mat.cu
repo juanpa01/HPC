@@ -11,7 +11,7 @@ void fill_matrix(float *mat, FILE *source, int rows, int cols){
 		for (int j = 0; j < cols; ++j){
 			fscanf(source, "%f,", &mat[i * cols + j]);
 		}
-
+	}
 	fclose(source);
 }
 
