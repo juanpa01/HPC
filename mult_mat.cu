@@ -31,7 +31,7 @@ void matrixKernel(float *d_a, float *d_b, float *d_r, int tam){
 		for (int i = 0; i < tam; ++i){
 			sum = sum + d_a[row*tam+i] * d_b[i*tam+col];
 		}
-		d_r[row*tam*col] = sum ;
+		d_r[row*tam+col] = sum ;
 	}
 }
 
