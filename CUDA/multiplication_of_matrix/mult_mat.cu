@@ -17,25 +17,35 @@ void print(float *V, int tam){
     printf("%.2f ", V[i]);
   }
   printf("\n");
-  
+
 }
 
 __global__
 
-void matrixKernel(float *d_a, float *d_b, float *d_r, int tam){
+void matrixKernel(float *d_a, float *d_b, float *d_r, int colA, int rowB, int colB, int rowB){
 	//calculamos los indices de la matrix
 	int col = blockIdx.x * blockDim.x + threadIdx.x;
 	int row = blockIdx.y * blockDim.y + threadIdx.y;
 
 	float sum = 0.0;
 
-	if (col < tam && row < tam)
+	if (row < rowA && col < colB) {
+		sum = 0.0;
+		for (int i = 0; i < rowb; i++) {
+			sum += d_a[row*colA+i] * d_b[i*colB+col];
+		}
+		d_r[row * colB + col] = sum;
+	}
+
+
+	/*if (col < tam && row < tam)
 	{
+		sum = 0.0;
 		for (int i = 0; i < tam; ++i){
-			sum = sum + d_a[row*tam+i] * d_b[i*tam+col];
+			sum += d_a[row*tam+i] * d_b[i*tam+col];
 		}
 		d_r[row*tam+col] = sum ;
-	}
+	}*/
 }
 
 
@@ -86,7 +96,7 @@ int main(int argc, char const** argv)
 
 	//llenar las matrices de las variables de cpu
 	fill_matrix(A, file_1, colA, rowA);
-	fill_matrix(B, file_2, colB, rowB); 
+	fill_matrix(B, file_2, colB, rowB);
 
 	//copiar los que tenemos en las variables de cpu a las variables de gpu
 	cudaMemcpy(d_a, A, colA*rowA*sizeof(float), cudaMemcpyHostToDevice);
@@ -98,15 +108,15 @@ int main(int argc, char const** argv)
 	dim3 dimBlock(4, 1, 1);
 
 	//kernel
-	matrixKernel<<<dimGrid, dimBlock>>>(d_a, d_b, d_r, colB*rowA);
+	matrixKernel<<<dimGrid, dimBlock>>>(d_a, d_b, d_r, colA, rowA, colB, rowB);
 
 	//copiamos el resultado desde la variable de la gpa a la variable de la cpu
 	cudaMemcpy(R, d_r, colB*rowA*sizeof(float), cudaMemcpyDeviceToHost);
 
 	//imprimimos el resultado
-	
+
 	printf("Matriz A\n");
-	print(A, colA*rowA);	
+	print(A, colA*rowA);
 	printf("\n");
 	printf("MAtriz B\n");
 	print(B, colB*rowB);
@@ -114,7 +124,7 @@ int main(int argc, char const** argv)
 	printf("Matriz Resultado\n");
 	print(R, colB*rowA);
 
-	
+
 
 	//liberar espacio en memoria
 	free(A); free(B); free(R);
