@@ -48,8 +48,16 @@ void MatrixMultiplyKernel(float *d_A, float *d_B, float *d_R, int colsA, int row
   float Pvalue = 0;
 
   for (int i = 0; i < ceil(rowsB/TILE_WIDTH); i++) {
-    
+    Mds[ty][tx] = d_A[row*rowsB + m*TILE_WIDTH + tx];
+    Nds[ty][tx] = d_B[(m*TILE_WIDTH + ty)*rowsB + col];
+    __syncthreads();
+
+    for (int k = 0; k < TILE_WIDTH; k++) {
+      Pvalue += Mds[ty][k] * Nds[k][tx];
+    }
+    __syncthreads();
   }
+  d_R[Row * rowsB + col] = Pvalue;
 }
 
 
