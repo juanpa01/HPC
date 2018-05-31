@@ -16,10 +16,10 @@ class NET(nn.Module):
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3)
         self.fc1 = nn.Linear(64*12*12, 128)
         self.fc2 = nn.Linear(128, 10)#capa de salida
-        self.loss_criterion = nn.CrossEntropyLoss()#Función de pérdida
+        self.loss_criterion = nn.CrossEntropyLoss()#Función de perdida
         
     def forward(self, x, target):
-        x = x.view(-1, 1, 28, 28)#transforma las imágenes a tamaño (n, 1, 28, 28)
+        x = x.view(-1, 1, 28, 28)#transforma las imagenes a tamaño (n, 1, 28, 28)
         x = F.relu(self.conv1(x))
         # la salida de conv1 es 32x26x26
         x = F.max_pool2d(F.relu(self.conv2(x)), 2)#El 2 es el stride
